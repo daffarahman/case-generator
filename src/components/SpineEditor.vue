@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import type { JewelPart } from '../types';
 import { DIMENSIONS, inchesToPixels } from '../constants';
+import Button from 'primevue/button';
 
 interface Props {
   part: JewelPart;
@@ -124,13 +125,11 @@ onMounted(() => { if (props.part.imageUrl) loadImage(props.part.imageUrl); });
 <template>
   <div class="flex flex-col items-center gap-4 p-4 bg-[#FAFAFA] border border-gray-200 rounded-lg">
     <!-- Toggle -->
-    <button 
-      class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700
-             hover:bg-gray-100 transition-colors"
+    <Button 
+      :label="isHorizontalView ? 'Vertical View' : 'Horizontal View'"
+      severity="secondary"
       @click="toggleViewMode"
-    >
-      {{ isHorizontalView ? 'Vertical View' : 'Horizontal View' }}
-    </button>
+    />
 
     <!-- Canvas -->
     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">

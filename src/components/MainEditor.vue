@@ -3,7 +3,9 @@ import { ref, watch, computed } from 'vue';
 import FrontEditor from './FrontEditor.vue';
 import TrayEditor from './TrayEditor.vue';
 import Button from 'primevue/button';
-import ToggleSwitch from 'primevue/toggleswitch';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
 import ExportPanel from './ExportPanel.vue';
 import AppFooter from './AppFooter.vue';
 import type { ProjectState } from '../types';
@@ -16,8 +18,8 @@ const projectState = ref<ProjectState>(createDefaultProjectState());
 // Sync spines toggle
 const syncSpines = ref(false);
 
-// Mobile tab state
-const activeTab = ref<'front' | 'tray'>('front');
+// Mobile tab state (0 = front, 1 = tray)
+const activeTabIndex = ref<string>('front');
 
 // Editor refs for PDF export
 const frontEditorRef = ref<InstanceType<typeof FrontEditor> | null>(null);
@@ -92,43 +94,23 @@ watch(syncSpines, (enabled) => {
 <template>
   <div class="min-h-screen bg-white">
     <!-- Header -->
-    <header class="border-b border-gray-200 bg-white">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-          <img src="/img/disc.jpg" alt="Cases" class="w-8 h-8 rounded-full object-cover" />
-          <h1 class="font-display text-2xl text-gray-900 tracking-tight">
-            Cases
-          </h1>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="text-sm text-gray-600">Sync Spines</span>
-          <ToggleSwitch v-model="syncSpines" />
-        </div>
+    <header class="bg-white">
+      <div class="max-w-7xl mx-auto px-6 py-8 flex flex-row justify-center items-center gap-3">
+        <img src="/img/disc.jpg" alt="Cases" class="w-24 h-24 object-cover select-none" />
+        <h1 class="font-display text-7xl text-gray-900 tracking-tight select-none">
+          Cases
+        </h1>
       </div>
     </header>
 
     <!-- Mobile Tabs -->
     <div class="lg:hidden border-b border-gray-200 bg-white">
-      <div class="flex">
-        <button 
-          class="flex-1 py-3 text-sm font-medium text-center transition-colors border-b-2"
-          :class="activeTab === 'front' 
-            ? 'border-gray-900 text-gray-900' 
-            : 'border-transparent text-gray-500 hover:text-gray-700'"
-          @click="activeTab = 'front'"
-        >
-          Front Cover
-        </button>
-        <button 
-          class="flex-1 py-3 text-sm font-medium text-center transition-colors border-b-2"
-          :class="activeTab === 'tray' 
-            ? 'border-gray-900 text-gray-900' 
-            : 'border-transparent text-gray-500 hover:text-gray-700'"
-          @click="activeTab = 'tray'"
-        >
-          Back Tray
-        </button>
-      </div>
+      <Tabs v-model:value="activeTabIndex">
+        <TabList class="w-full">
+          <Tab value="front" class="flex-1">Front Cover</Tab>
+          <Tab value="tray" class="flex-1">Back Tray</Tab>
+        </TabList>
+      </Tabs>
     </div>
 
     <!-- Main Content -->
@@ -138,7 +120,7 @@ watch(syncSpines, (enabled) => {
         <!-- Front Cover Panel -->
         <section 
           class="bg-[#FAFAFA] border border-gray-200 rounded-lg p-6"
-          :class="{ 'hidden lg:block': activeTab !== 'front' }"
+          :class="{ 'hidden lg:block': activeTabIndex !== 'front' }"
         >
           <FrontEditor 
             ref="frontEditorRef"
@@ -160,13 +142,14 @@ watch(syncSpines, (enabled) => {
         <!-- Tray Panel -->
         <section 
           class="bg-[#FAFAFA] border border-gray-200 rounded-lg p-6"
-          :class="{ 'hidden lg:block': activeTab !== 'tray' }"
+          :class="{ 'hidden lg:block': activeTabIndex !== 'tray' }"
         >
           <TrayEditor 
             ref="trayEditorRef"
             :tray="projectState.tray"
             :syncSpines="syncSpines"
             @update:tray="updateTray"
+            @update:syncSpines="syncSpines = $event"
           />
           <div class="mt-6 flex justify-center gap-3">
             <Button 

@@ -130,7 +130,7 @@ const borderConfig = computed(() => ({
   <div class="flex flex-col gap-4">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h3 class="font-display text-lg font-medium text-gray-900">Front Cover</h3>
+      <h3 class="font-display text-lg font-medium text-gray-500">Front Cover</h3>
       <div class="text-xs text-gray-500">
         {{ DIMENSIONS.frontCover.widthInches }}" × {{ DIMENSIONS.frontCover.heightInches }}"
         <span class="text-gray-400 ml-1">({{ DIMENSIONS.frontCover.widthMm }} × {{ DIMENSIONS.frontCover.heightMm }}mm)</span>
