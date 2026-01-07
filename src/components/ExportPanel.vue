@@ -7,13 +7,11 @@ import { exportToPDF, PAPER_SIZES } from '../services/ExportService';
 interface Props {
   frontStage: Konva.Stage | null;
   trayStage: Konva.Stage | null;
-  title?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  title: 'Untitled Album',
-});
+const props = defineProps<Props>();
 
+const albumTitle = ref('Untitled Album');
 const selectedPaperSize = ref<keyof typeof PAPER_SIZES>('A4');
 const isExporting = ref(false);
 
@@ -32,7 +30,7 @@ const handleExport = async () => {
   try {
     await exportToPDF({
       paperSize: selectedPaperSize.value,
-      title: props.title,
+      title: albumTitle.value,
       frontStage: props.frontStage,
       trayStage: props.trayStage,
     });
@@ -45,10 +43,22 @@ const handleExport = async () => {
 </script>
 
 <template>
-  <div class="border-t border-gray-200 pt-6 mt-6">
+  <div>
     <!-- Header -->
     <h3 class="font-display text-lg text-gray-900 mb-4">Export</h3>
     
+    <!-- Album Title -->
+    <div class="mb-4">
+      <label class="block text-sm text-gray-600 mb-2">Album Title</label>
+      <input 
+        v-model="albumTitle"
+        type="text"
+        placeholder="Enter album title"
+        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900
+               focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+      />
+    </div>
+
     <!-- Paper Size Selection -->
     <div class="mb-4">
       <label class="block text-sm text-gray-600 mb-2">Paper Size</label>

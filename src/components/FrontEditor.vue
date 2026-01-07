@@ -138,19 +138,21 @@ const borderConfig = computed(() => ({
     </div>
 
     <!-- Canvas Container -->
-    <div class="bg-white border border-gray-200 rounded-lg p-6 flex justify-center">
+    <div class="bg-white border border-gray-200 rounded-lg p-6 flex justify-center overflow-x-auto">
       <v-stage ref="stageRef" :config="stageConfig">
         <v-layer>
           <!-- Background -->
           <v-rect :config="{ x: 0, y: 0, width: FRONT_WIDTH, height: FRONT_HEIGHT, fill: '#F9FAFB' }" />
           
-          <!-- User Image -->
-          <v-image
-            v-if="imageConfig"
-            :config="imageConfig"
-            :dragBoundFunc="dragBoundFunc"
-            @dragend="handleDragEnd"
-          />
+          <!-- User Image (clipped to bounds) -->
+          <v-group :config="{ clipX: 0, clipY: 0, clipWidth: FRONT_WIDTH, clipHeight: FRONT_HEIGHT }">
+            <v-image
+              v-if="imageConfig"
+              :config="imageConfig"
+              :dragBoundFunc="dragBoundFunc"
+              @dragend="handleDragEnd"
+            />
+          </v-group>
           
           <!-- Cut Line Border -->
           <v-rect :config="borderConfig" />

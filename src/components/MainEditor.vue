@@ -11,8 +11,7 @@ import Konva from 'konva';
 // Project state
 const projectState = ref<ProjectState>(createDefaultProjectState());
 
-// Album title for export filename
-const albumTitle = ref('Untitled Album');
+
 
 // Sync spines toggle
 const syncSpines = ref(false);
@@ -213,15 +212,16 @@ watch(syncSpines, (enabled) => {
               @change="(e) => handleTrayUpload('rightSpine', e)"
             />
           </div>
-
-          <!-- Export Panel (inside Tray section for now) -->
-          <ExportPanel 
-            :frontStage="frontStage"
-            :trayStage="trayStage"
-            :title="albumTitle"
-          />
         </section>
       </div>
+
+      <!-- Export Panel -->
+      <section class="mt-8 bg-[#FAFAFA] border border-gray-200 rounded-lg p-6 w-full">
+        <ExportPanel 
+          :frontStage="frontStage"
+          :trayStage="trayStage"
+        />
+      </section>
 
       <!-- Footer -->
       <footer class="mt-12 text-center">
