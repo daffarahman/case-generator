@@ -2,16 +2,16 @@
 import { ref, watch, computed } from 'vue';
 import FrontEditor from './FrontEditor.vue';
 import TrayEditor from './TrayEditor.vue';
-import BaseButton from './BaseButton.vue';
+import Button from 'primevue/button';
+import ToggleSwitch from 'primevue/toggleswitch';
 import ExportPanel from './ExportPanel.vue';
+import AppFooter from './AppFooter.vue';
 import type { ProjectState } from '../types';
 import { createDefaultProjectState } from '../types';
 import Konva from 'konva';
 
 // Project state
 const projectState = ref<ProjectState>(createDefaultProjectState());
-
-
 
 // Sync spines toggle
 const syncSpines = ref(false);
@@ -94,17 +94,16 @@ watch(syncSpines, (enabled) => {
     <!-- Header -->
     <header class="border-b border-gray-200 bg-white">
       <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <h1 class="font-display text-2xl text-gray-900 tracking-tight">
-          CD Jewel Case Maker
-        </h1>
-        <label class="flex items-center gap-3 cursor-pointer select-none">
+        <div class="flex items-center gap-3">
+          <img src="/img/disc.jpg" alt="Cases" class="w-8 h-8 rounded-full object-cover" />
+          <h1 class="font-display text-2xl text-gray-900 tracking-tight">
+            Cases
+          </h1>
+        </div>
+        <div class="flex items-center gap-3">
           <span class="text-sm text-gray-600">Sync Spines</span>
-          <div class="relative">
-            <input type="checkbox" v-model="syncSpines" class="peer sr-only" />
-            <div class="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-gray-900 transition-colors"></div>
-            <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5"></div>
-          </div>
-        </label>
+          <ToggleSwitch v-model="syncSpines" />
+        </div>
       </div>
     </header>
 
@@ -147,9 +146,7 @@ watch(syncSpines, (enabled) => {
             @update:front="updateFront"
           />
           <div class="mt-6 flex justify-center">
-            <BaseButton @click="triggerFrontUpload">
-              Upload Image
-            </BaseButton>
+            <Button label="Upload Image" @click="triggerFrontUpload" />
             <input 
               ref="frontFileInput"
               type="file" 
@@ -172,23 +169,19 @@ watch(syncSpines, (enabled) => {
             @update:tray="updateTray"
           />
           <div class="mt-6 flex justify-center gap-3">
-            <BaseButton 
-              variant="secondary"
+            <Button 
+              label="Left Spine"
+              severity="secondary"
               :disabled="syncSpines"
               @click="triggerLeftSpineUpload"
-            >
-              Left Spine
-            </BaseButton>
-            <BaseButton @click="triggerBackCenterUpload">
-              Back Center
-            </BaseButton>
-            <BaseButton 
-              variant="secondary"
+            />
+            <Button label="Back Center" @click="triggerBackCenterUpload" />
+            <Button 
+              label="Right Spine"
+              severity="secondary"
               :disabled="syncSpines"
               @click="triggerRightSpineUpload"
-            >
-              Right Spine
-            </BaseButton>
+            />
             
             <input 
               ref="leftSpineFileInput"
@@ -215,6 +208,10 @@ watch(syncSpines, (enabled) => {
         </section>
       </div>
 
+      <p class="text-xs text-gray-400 text-center mt-4">
+        Dashed lines indicate the 0.125" bleed area
+      </p>
+
       <!-- Export Panel -->
       <section class="mt-8 bg-[#FAFAFA] border border-gray-200 rounded-lg p-6 w-full">
         <ExportPanel 
@@ -223,12 +220,8 @@ watch(syncSpines, (enabled) => {
         />
       </section>
 
-      <!-- Footer -->
-      <footer class="mt-12 text-center">
-        <p class="text-xs text-gray-400">
-          Dashed lines indicate the 0.125" bleed area
-        </p>
-      </footer>
     </main>
+
+    <AppFooter />
   </div>
 </template>
