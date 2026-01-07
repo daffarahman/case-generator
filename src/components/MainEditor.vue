@@ -192,7 +192,7 @@ watch(syncSpines, (enabled) => {
       </div>
 
       <p class="text-xs text-gray-400 text-center mt-4">
-        Dashed lines indicate the 0.125" bleed area
+        Dashed lines indicate the 3.2mm bleed area
       </p>
 
       <!-- Export Panel -->

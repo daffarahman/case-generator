@@ -20,7 +20,7 @@ const isExporting = ref(false);
 const paperOptions = computed(() => 
   Object.entries(PAPER_SIZES).map(([key, value]) => ({
     value: key,
-    label: `${value.name} (${value.width}" × ${value.height}")`,
+    label: `${value.name} (${Math.round(value.width * 25.4)} × ${Math.round(value.height * 25.4)}mm)`,
   }))
 );
 

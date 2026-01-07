@@ -236,17 +236,18 @@ const borderConfig = computed(() => ({
 <template>
   <div class="flex flex-col gap-4">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <h3 class="font-display text-lg font-medium text-gray-500">Back Tray</h3>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">Sync Spines</span>
-          <ToggleSwitch :modelValue="syncSpines" @update:modelValue="emit('update:syncSpines', $event)" />
+    <div class="flex flex-col gap-2">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-3">
+          <h3 class="font-display text-lg font-medium text-gray-500">Back Tray</h3>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span>Sync Spines</span>
+            <ToggleSwitch :modelValue="syncSpines" @update:modelValue="emit('update:syncSpines', $event)" />
+          </div>
         </div>
-      </div>
-      <div class="text-xs text-gray-500">
-        {{ DIMENSIONS.trayTotal.widthInches }}" × {{ DIMENSIONS.trayTotal.heightInches }}"
-        <span class="text-gray-400 ml-1">({{ DIMENSIONS.trayTotal.widthMm }} × {{ DIMENSIONS.trayTotal.heightMm }}mm)</span>
+        <div class="text-xs text-gray-500">
+          {{ DIMENSIONS.trayTotal.widthMm }} × {{ DIMENSIONS.trayTotal.heightMm }}mm
+        </div>
       </div>
     </div>
 
