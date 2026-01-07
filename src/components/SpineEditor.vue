@@ -127,6 +127,7 @@ onMounted(() => { if (props.part.imageUrl) loadImage(props.part.imageUrl); });
     <!-- Toggle -->
     <Button 
       :label="isHorizontalView ? 'Vertical View' : 'Horizontal View'"
+      :icon="isHorizontalView ? 'pi pi-arrows-v' : 'pi pi-arrows-h'"
       severity="secondary"
       @click="toggleViewMode"
     />

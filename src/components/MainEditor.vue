@@ -128,8 +128,8 @@ watch(syncSpines, (enabled) => {
             @update:front="updateFront"
           />
           <div class="mt-6 flex justify-center">
-            <Button label="Upload Image" @click="triggerFrontUpload" />
-            <input 
+            <Button label="Upload Image" icon="pi pi-upload" @click="triggerFrontUpload" />
+            <input  
               ref="frontFileInput"
               type="file" 
               accept="image/*" 
@@ -154,13 +154,15 @@ watch(syncSpines, (enabled) => {
           <div class="mt-6 flex justify-center gap-3">
             <Button 
               label="Left Spine"
+              icon="pi pi-align-left"
               severity="secondary"
               :disabled="syncSpines"
               @click="triggerLeftSpineUpload"
             />
-            <Button label="Back Center" @click="triggerBackCenterUpload" />
+            <Button label="Back Center" icon="pi pi-image" @click="triggerBackCenterUpload" />
             <Button 
               label="Right Spine"
+              icon="pi pi-align-right"
               severity="secondary"
               :disabled="syncSpines"
               @click="triggerRightSpineUpload"
@@ -195,13 +197,13 @@ watch(syncSpines, (enabled) => {
         Dashed lines indicate the 3.2mm bleed area
       </p>
 
-      <!-- Export Panel -->
-      <section class="mt-8 bg-[#FAFAFA] border border-gray-200 rounded-lg p-6 w-full">
+      <!-- Download Button -->
+      <div class="mt-8 flex justify-center">
         <ExportPanel 
           :frontStage="frontStage"
           :trayStage="trayStage"
         />
-      </section>
+      </div>
 
     </main>
 

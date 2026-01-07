@@ -4,6 +4,7 @@ import Konva from 'konva';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
+import Dialog from 'primevue/dialog';
 import { exportToPDF, PAPER_SIZES } from '../services/ExportService';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const dialogVisible = ref(false);
 const albumTitle = ref('Untitled Album');
 const selectedPaperSize = ref<keyof typeof PAPER_SIZES>('A4');
 const isExporting = ref(false);
@@ -36,6 +38,7 @@ const handleExport = async () => {
       frontStage: props.frontStage,
       trayStage: props.trayStage,
     });
+    dialogVisible.value = false;
   } catch (error) {
     console.error('Export failed:', error);
   } finally {
@@ -45,10 +48,20 @@ const handleExport = async () => {
 </script>
 
 <template>
-  <div>
-    <!-- Header -->
-    <h3 class="font-display text-lg text-gray-900 mb-4">Export</h3>
-    
+  <!-- Trigger Button -->
+  <Button 
+    label="Download / Print"
+    icon="pi pi-download"
+    @click="dialogVisible = true"
+  />
+
+  <!-- Export Dialog -->
+  <Dialog 
+    v-model:visible="dialogVisible"
+    header="Export"
+    modal
+    :style="{ width: '400px' }"
+  >
     <!-- Album Title -->
     <div class="mb-4">
       <label class="block text-sm text-gray-600 mb-2">Album Title</label>
@@ -74,6 +87,7 @@ const handleExport = async () => {
     <!-- Export Button -->
     <Button 
       :label="isExporting ? 'Generating...' : 'Download PDF'"
+      :icon="isExporting ? 'pi pi-spin pi-spinner' : 'pi pi-file-pdf'"
       :disabled="isExporting"
       :loading="isExporting"
       class="w-full"
@@ -84,5 +98,5 @@ const handleExport = async () => {
     <p class="mt-3 text-xs text-gray-400 text-center">
       Exports at 300 DPI with crop marks
     </p>
-  </div>
+  </Dialog>
 </template>
