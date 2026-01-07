@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import type { Tray } from '../types';
 import { DIMENSIONS, inchesToPixels } from '../constants';
+import Konva from 'konva';
 
 interface Props {
   tray: Tray;
@@ -23,6 +24,15 @@ const TRAY_TOTAL_WIDTH = DIMENSIONS.trayTotal.width;
 const BLEED_SIZE = inchesToPixels(0.125);
 
 const useFullTray = ref(false);
+
+// Stage ref for PDF export
+const stageRef = ref<{ getNode: () => Konva.Stage } | null>(null);
+
+const getStage = (): Konva.Stage | null => {
+  return stageRef.value?.getNode() || null;
+};
+
+defineExpose({ getStage });
 
 const leftSpineImg = ref<HTMLImageElement | null>(null);
 const backCenterImg = ref<HTMLImageElement | null>(null);
@@ -234,7 +244,7 @@ const borderConfig = computed(() => ({
 
     <!-- Canvas Container -->
     <div class="bg-white border border-gray-200 rounded-lg p-6 overflow-x-auto">
-      <v-stage :config="stageConfig">
+      <v-stage ref="stageRef" :config="stageConfig">
         <v-layer>
           <!-- Background sections -->
           <v-rect :config="{ x: leftSpineX, y: 0, width: LEFT_SPINE_WIDTH, height: TRAY_HEIGHT, fill: '#F3F4F6' }" />

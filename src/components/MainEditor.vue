@@ -1,19 +1,37 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import FrontEditor from './FrontEditor.vue';
 import TrayEditor from './TrayEditor.vue';
 import BaseButton from './BaseButton.vue';
+import ExportPanel from './ExportPanel.vue';
 import type { ProjectState } from '../types';
 import { createDefaultProjectState } from '../types';
+import Konva from 'konva';
 
 // Project state
 const projectState = ref<ProjectState>(createDefaultProjectState());
+
+// Album title for export filename
+const albumTitle = ref('Untitled Album');
 
 // Sync spines toggle
 const syncSpines = ref(false);
 
 // Mobile tab state
 const activeTab = ref<'front' | 'tray'>('front');
+
+// Editor refs for PDF export
+const frontEditorRef = ref<InstanceType<typeof FrontEditor> | null>(null);
+const trayEditorRef = ref<InstanceType<typeof TrayEditor> | null>(null);
+
+// Get stage refs for export
+const frontStage = computed((): Konva.Stage | null => {
+  return frontEditorRef.value?.getStage() || null;
+});
+
+const trayStage = computed((): Konva.Stage | null => {
+  return trayEditorRef.value?.getStage() || null;
+});
 
 // File upload refs
 const frontFileInput = ref<HTMLInputElement | null>(null);
@@ -125,6 +143,7 @@ watch(syncSpines, (enabled) => {
           :class="{ 'hidden lg:block': activeTab !== 'front' }"
         >
           <FrontEditor 
+            ref="frontEditorRef"
             :front="projectState.front"
             @update:front="updateFront"
           />
@@ -148,6 +167,7 @@ watch(syncSpines, (enabled) => {
           :class="{ 'hidden lg:block': activeTab !== 'tray' }"
         >
           <TrayEditor 
+            ref="trayEditorRef"
             :tray="projectState.tray"
             :syncSpines="syncSpines"
             @update:tray="updateTray"
@@ -193,6 +213,13 @@ watch(syncSpines, (enabled) => {
               @change="(e) => handleTrayUpload('rightSpine', e)"
             />
           </div>
+
+          <!-- Export Panel (inside Tray section for now) -->
+          <ExportPanel 
+            :frontStage="frontStage"
+            :trayStage="trayStage"
+            :title="albumTitle"
+          />
         </section>
       </div>
 

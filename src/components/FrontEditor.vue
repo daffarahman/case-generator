@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import type { FrontCover } from '../types';
 import { DIMENSIONS, inchesToPixels } from '../constants';
+import Konva from 'konva';
 
 interface Props {
   front: FrontCover;
@@ -17,6 +18,15 @@ const emit = defineEmits<Emits>();
 const FRONT_WIDTH = DIMENSIONS.frontCover.width;
 const FRONT_HEIGHT = DIMENSIONS.frontCover.height;
 const BLEED_SIZE = inchesToPixels(0.125);
+
+// Stage ref for PDF export
+const stageRef = ref<{ getNode: () => Konva.Stage } | null>(null);
+
+const getStage = (): Konva.Stage | null => {
+  return stageRef.value?.getNode() || null;
+};
+
+defineExpose({ getStage });
 
 const imageElement = ref<HTMLImageElement | null>(null);
 const isImageLoaded = ref(false);
@@ -129,7 +139,7 @@ const borderConfig = computed(() => ({
 
     <!-- Canvas Container -->
     <div class="bg-white border border-gray-200 rounded-lg p-6 flex justify-center">
-      <v-stage :config="stageConfig">
+      <v-stage ref="stageRef" :config="stageConfig">
         <v-layer>
           <!-- Background -->
           <v-rect :config="{ x: 0, y: 0, width: FRONT_WIDTH, height: FRONT_HEIGHT, fill: '#F9FAFB' }" />
