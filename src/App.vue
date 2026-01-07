@@ -1,9 +1,11 @@
 <script setup lang="ts">
-
+import MainEditor from './components/MainEditor.vue';
 </script>
 
 <template>
-  <div>
-    
-  </div>
+  <MainEditor />
 </template>
+
+<style>
+/* Global reset handled in style.css */
+</style>
