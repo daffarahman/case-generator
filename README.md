@@ -1,7 +1,7 @@
 # CD Case Generator
 
 <p align="center">
-  <img src="public/img/cases-logo.png" alt="Cases Logo" width="200" />
+  <img src="public/img/cases-logo.png" alt="Cases Logo" />
 </p>
 
 A web-based tool for creating printable CD jewel case covers. Upload your artwork, position it precisely, and export a print-ready PDF.
