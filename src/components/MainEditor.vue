@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import FrontEditor from './FrontEditor.vue';
 import TrayEditor from './TrayEditor.vue';
+import BaseButton from './BaseButton.vue';
 import type { ProjectState } from '../types';
 import { createDefaultProjectState } from '../types';
-
-/**
- * MainEditor Component
- * Orchestrates FrontEditor and TrayEditor
- * - Desktop: Side-by-side layout
- * - Mobile: Tab switcher
- * - Sync Spines toggle for mirroring left/right spines
- */
 
 // Project state
 const projectState = ref<ProjectState>(createDefaultProjectState());
@@ -22,18 +15,17 @@ const syncSpines = ref(false);
 // Mobile tab state
 const activeTab = ref<'front' | 'tray'>('front');
 
-// File upload handlers
+// File upload refs
 const frontFileInput = ref<HTMLInputElement | null>(null);
 const leftSpineFileInput = ref<HTMLInputElement | null>(null);
 const backCenterFileInput = ref<HTMLInputElement | null>(null);
 const rightSpineFileInput = ref<HTMLInputElement | null>(null);
 
-// Handle front cover upload
+// Upload handlers
 const handleFrontUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = (e) => {
     projectState.value.front.image.imageUrl = e.target?.result as string;
@@ -41,18 +33,14 @@ const handleFrontUpload = (event: Event) => {
   reader.readAsDataURL(file);
 };
 
-// Handle tray section uploads
 const handleTrayUpload = (section: 'leftSpine' | 'backCenter' | 'rightSpine', event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageUrl = e.target?.result as string;
     projectState.value.tray[section].image.imageUrl = imageUrl;
-    
-    // Sync to right spine if syncing and uploading to left
     if (syncSpines.value && section === 'leftSpine') {
       projectState.value.tray.rightSpine.image.imageUrl = imageUrl;
     }
@@ -60,7 +48,6 @@ const handleTrayUpload = (section: 'leftSpine' | 'backCenter' | 'rightSpine', ev
   reader.readAsDataURL(file);
 };
 
-// Update handlers
 const updateFront = (front: typeof projectState.value.front) => {
   projectState.value.front = front;
 };
@@ -69,16 +56,13 @@ const updateTray = (tray: typeof projectState.value.tray) => {
   projectState.value.tray = tray;
 };
 
-// Trigger file inputs
 const triggerFrontUpload = () => frontFileInput.value?.click();
 const triggerLeftSpineUpload = () => leftSpineFileInput.value?.click();
 const triggerBackCenterUpload = () => backCenterFileInput.value?.click();
 const triggerRightSpineUpload = () => rightSpineFileInput.value?.click();
 
-// Watch sync toggle
 watch(syncSpines, (enabled) => {
   if (enabled) {
-    // Copy left spine to right spine
     projectState.value.tray.rightSpine.image = {
       ...projectState.value.tray.leftSpine.image,
       id: 'right-spine',
@@ -89,319 +73,135 @@ watch(syncSpines, (enabled) => {
 </script>
 
 <template>
-  <div class="main-editor">
+  <div class="min-h-screen bg-white">
     <!-- Header -->
-    <header class="editor-header">
-      <h1 class="title">
-        <span class="title-icon">💿</span>
-        CD Jewel Case Maker
-      </h1>
-      <div class="sync-toggle">
-        <label class="toggle-label">
-          <input type="checkbox" v-model="syncSpines" class="toggle-checkbox" />
-          <span class="toggle-switch"></span>
-          <span class="toggle-text">Sync Spines</span>
+    <header class="border-b border-gray-200 bg-white">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <h1 class="font-display text-2xl text-gray-900 tracking-tight">
+          CD Jewel Case Maker
+        </h1>
+        <label class="flex items-center gap-3 cursor-pointer select-none">
+          <span class="text-sm text-gray-600">Sync Spines</span>
+          <div class="relative">
+            <input type="checkbox" v-model="syncSpines" class="peer sr-only" />
+            <div class="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-gray-900 transition-colors"></div>
+            <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5"></div>
+          </div>
         </label>
       </div>
     </header>
 
     <!-- Mobile Tabs -->
-    <div class="mobile-tabs">
-      <button 
-        class="tab-btn" 
-        :class="{ active: activeTab === 'front' }"
-        @click="activeTab = 'front'"
-      >
-        Front Cover
-      </button>
-      <button 
-        class="tab-btn" 
-        :class="{ active: activeTab === 'tray' }"
-        @click="activeTab = 'tray'"
-      >
-        Back Tray
-      </button>
-    </div>
-
-    <!-- Editor Grid -->
-    <div class="editor-grid">
-      <!-- Front Editor Panel -->
-      <div class="editor-panel front-panel" :class="{ 'mobile-hidden': activeTab !== 'front' }">
-        <FrontEditor 
-          :front="projectState.front"
-          @update:front="updateFront"
-        />
-        <div class="upload-controls">
-          <button class="upload-btn" @click="triggerFrontUpload">
-            <span class="btn-icon">📷</span>
-            Upload Front Cover
-          </button>
-          <input 
-            ref="frontFileInput"
-            type="file" 
-            accept="image/*" 
-            class="hidden-input"
-            @change="handleFrontUpload"
-          />
-        </div>
-      </div>
-
-      <!-- Tray Editor Panel -->
-      <div class="editor-panel tray-panel" :class="{ 'mobile-hidden': activeTab !== 'tray' }">
-        <TrayEditor 
-          :tray="projectState.tray"
-          :syncSpines="syncSpines"
-          @update:tray="updateTray"
-        />
-        <div class="upload-controls tray-uploads">
-          <button class="upload-btn small" @click="triggerLeftSpineUpload" :disabled="syncSpines">
-            Left Spine
-          </button>
-          <button class="upload-btn" @click="triggerBackCenterUpload">
-            <span class="btn-icon">📷</span>
-            Back Center
-          </button>
-          <button class="upload-btn small" @click="triggerRightSpineUpload" :disabled="syncSpines">
-            Right Spine
-          </button>
-          
-          <!-- Hidden inputs -->
-          <input 
-            ref="leftSpineFileInput"
-            type="file" 
-            accept="image/*" 
-            class="hidden-input"
-            @change="(e) => handleTrayUpload('leftSpine', e)"
-          />
-          <input 
-            ref="backCenterFileInput"
-            type="file" 
-            accept="image/*" 
-            class="hidden-input"
-            @change="(e) => handleTrayUpload('backCenter', e)"
-          />
-          <input 
-            ref="rightSpineFileInput"
-            type="file" 
-            accept="image/*" 
-            class="hidden-input"
-            @change="(e) => handleTrayUpload('rightSpine', e)"
-          />
-        </div>
+    <div class="lg:hidden border-b border-gray-200 bg-white">
+      <div class="flex">
+        <button 
+          class="flex-1 py-3 text-sm font-medium text-center transition-colors border-b-2"
+          :class="activeTab === 'front' 
+            ? 'border-gray-900 text-gray-900' 
+            : 'border-transparent text-gray-500 hover:text-gray-700'"
+          @click="activeTab = 'front'"
+        >
+          Front Cover
+        </button>
+        <button 
+          class="flex-1 py-3 text-sm font-medium text-center transition-colors border-b-2"
+          :class="activeTab === 'tray' 
+            ? 'border-gray-900 text-gray-900' 
+            : 'border-transparent text-gray-500 hover:text-gray-700'"
+          @click="activeTab = 'tray'"
+        >
+          Back Tray
+        </button>
       </div>
     </div>
 
-    <!-- Footer hint -->
-    <footer class="editor-footer">
-      <p class="hint">Red dashed lines indicate the 0.125" safety zone (bleed area)</p>
-    </footer>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto p-6 lg:p-12">
+      <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 justify-center">
+        
+        <!-- Front Cover Panel -->
+        <section 
+          class="bg-[#FAFAFA] border border-gray-200 rounded-lg p-6"
+          :class="{ 'hidden lg:block': activeTab !== 'front' }"
+        >
+          <FrontEditor 
+            :front="projectState.front"
+            @update:front="updateFront"
+          />
+          <div class="mt-6 flex justify-center">
+            <BaseButton @click="triggerFrontUpload">
+              Upload Image
+            </BaseButton>
+            <input 
+              ref="frontFileInput"
+              type="file" 
+              accept="image/*" 
+              class="hidden"
+              @change="handleFrontUpload"
+            />
+          </div>
+        </section>
+
+        <!-- Tray Panel -->
+        <section 
+          class="bg-[#FAFAFA] border border-gray-200 rounded-lg p-6"
+          :class="{ 'hidden lg:block': activeTab !== 'tray' }"
+        >
+          <TrayEditor 
+            :tray="projectState.tray"
+            :syncSpines="syncSpines"
+            @update:tray="updateTray"
+          />
+          <div class="mt-6 flex justify-center gap-3">
+            <BaseButton 
+              variant="secondary"
+              :disabled="syncSpines"
+              @click="triggerLeftSpineUpload"
+            >
+              Left Spine
+            </BaseButton>
+            <BaseButton @click="triggerBackCenterUpload">
+              Back Center
+            </BaseButton>
+            <BaseButton 
+              variant="secondary"
+              :disabled="syncSpines"
+              @click="triggerRightSpineUpload"
+            >
+              Right Spine
+            </BaseButton>
+            
+            <input 
+              ref="leftSpineFileInput"
+              type="file" 
+              accept="image/*" 
+              class="hidden"
+              @change="(e) => handleTrayUpload('leftSpine', e)"
+            />
+            <input 
+              ref="backCenterFileInput"
+              type="file" 
+              accept="image/*" 
+              class="hidden"
+              @change="(e) => handleTrayUpload('backCenter', e)"
+            />
+            <input 
+              ref="rightSpineFileInput"
+              type="file" 
+              accept="image/*" 
+              class="hidden"
+              @change="(e) => handleTrayUpload('rightSpine', e)"
+            />
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-12 text-center">
+        <p class="text-xs text-gray-400">
+          Dashed lines indicate the 0.125" bleed area
+        </p>
+      </footer>
+    </main>
   </div>
 </template>
-
-<style scoped>
-.main-editor {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-  padding: 24px;
-}
-
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-}
-
-.title-icon {
-  font-size: 32px;
-}
-
-/* Sync Toggle */
-.sync-toggle {
-  display: flex;
-  align-items: center;
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-}
-
-.toggle-checkbox {
-  display: none;
-}
-
-.toggle-switch {
-  position: relative;
-  width: 48px;
-  height: 26px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 13px;
-  transition: all 0.3s ease;
-}
-
-.toggle-switch::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-}
-
-.toggle-checkbox:checked + .toggle-switch {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.toggle-checkbox:checked + .toggle-switch::after {
-  left: 25px;
-}
-
-.toggle-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* Mobile Tabs */
-.mobile-tabs {
-  display: none;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-@media (max-width: 1024px) {
-  .mobile-tabs {
-    display: flex;
-  }
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: transparent;
-  color: white;
-}
-
-/* Editor Grid */
-.editor-grid {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 32px;
-  align-items: start;
-}
-
-@media (max-width: 1024px) {
-  .editor-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .mobile-hidden {
-    display: none !important;
-  }
-}
-
-.editor-panel {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Upload Controls */
-.upload-controls {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-.tray-uploads {
-  justify-content: space-between;
-}
-
-.upload-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upload-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
-}
-
-.upload-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.upload-btn.small {
-  padding: 10px 16px;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.upload-btn.small:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.btn-icon {
-  font-size: 16px;
-}
-
-.hidden-input {
-  display: none;
-}
-
-/* Footer */
-.editor-footer {
-  margin-top: 24px;
-  text-align: center;
-}
-
-.hint {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
-}
-</style>
