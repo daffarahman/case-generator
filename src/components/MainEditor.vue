@@ -95,11 +95,26 @@ watch(syncSpines, (enabled) => {
   <div class="min-h-screen bg-white">
     <!-- Header -->
     <header class="bg-white">
-      <div class="max-w-7xl mx-auto px-6 py-8 flex flex-row justify-center items-center gap-3">
-        <img src="/img/disc.jpg" alt="Cases" class="w-24 h-24 object-cover select-none" />
-        <h1 class="font-display text-7xl text-gray-900 tracking-tight select-none">
-          Cases
-        </h1>
+      <div class="max-w-7xl mx-auto px-6 py-6">
+        <!-- Support Button Row -->
+        <div class="flex justify-end mb-4">
+          <a href="https://trakteer.id/daffarahman/tip" target="_blank" rel="noopener noreferrer">
+            <Button 
+              label="Support" 
+              icon="pi pi-crown" 
+              severity="secondary"
+              outlined
+              class="!rounded-full !border-amber-500 !text-amber-600 hover:!bg-amber-50"
+            />
+          </a>
+        </div>
+        <!-- Centered Logo and Title -->
+        <div class="flex flex-row justify-center items-center gap-2 sm:gap-3">
+          <img src="/img/disc.jpg" alt="Cases" class="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-cover select-none" />
+          <h1 class="font-display text-4xl sm:text-5xl lg:text-7xl text-gray-900 tracking-tight select-none">
+            Cases
+          </h1>
+        </div>
       </div>
     </header>
 
