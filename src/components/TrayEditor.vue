@@ -2,7 +2,6 @@
 import { ref, computed, watch } from 'vue';
 import type { Tray } from '../types';
 import { DIMENSIONS, inchesToPixels } from '../constants';
-import ToggleSwitch from 'primevue/toggleswitch';
 import Konva from 'konva';
 
 interface Props {
@@ -242,13 +241,7 @@ const borderConfig = computed(() => ({
     <!-- Header -->
     <div class="flex flex-col gap-2">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-3">
-          <h3 class="font-display text-lg font-medium text-gray-500">Back Tray</h3>
-          <div class="flex items-center gap-2 text-xs text-gray-500">
-            <span>Sync Spines</span>
-            <ToggleSwitch :modelValue="syncSpines" @update:modelValue="emit('update:syncSpines', $event)" />
-          </div>
-        </div>
+        <h3 class="font-display text-lg font-medium text-gray-500">Back Tray</h3>
         <div class="text-xs text-gray-500">
           {{ DIMENSIONS.trayTotal.widthMm }} × {{ DIMENSIONS.trayTotal.heightMm }}mm
         </div>

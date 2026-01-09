@@ -6,13 +6,20 @@ import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
 import Dialog from 'primevue/dialog';
 import { exportToPDF, PAPER_SIZES } from '../services/ExportService';
+import type { MediaFormat } from '../formatTypes';
+import { FORMATS } from '../formatTypes';
 
 interface Props {
   frontStage: Konva.Stage | null;
   trayStage: Konva.Stage | null;
+  activeFormat: MediaFormat;
 }
 
 const props = defineProps<Props>();
+
+const activeFormatLabel = computed(() => 
+  FORMATS.find(f => f.id === props.activeFormat)?.label || props.activeFormat.toUpperCase()
+);
 
 const dialogVisible = ref(false);
 const albumTitle = ref('Untitled Album');
@@ -58,7 +65,7 @@ const handleExport = async () => {
   <!-- Export Dialog -->
   <Dialog 
     v-model:visible="dialogVisible"
-    header="Export"
+    :header="`Export - ${activeFormatLabel}`"
     modal
     :style="{ width: '400px' }"
   >

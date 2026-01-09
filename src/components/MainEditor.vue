@@ -6,11 +6,16 @@ import Button from 'primevue/button';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
+import ToggleSwitch from 'primevue/toggleswitch';
 import ExportPanel from './ExportPanel.vue';
 import AppFooter from './AppFooter.vue';
 import type { ProjectState } from '../types';
 import { createDefaultProjectState } from '../types';
+import { FORMATS, type MediaFormat } from '../formatTypes';
 import Konva from 'konva';
+
+// Active media format
+const activeFormat = ref<MediaFormat>('cd');
 
 // Project state
 const projectState = ref<ProjectState>(createDefaultProjectState());
@@ -118,8 +123,21 @@ watch(syncSpines, (enabled) => {
       </div>
     </header>
 
-    <!-- Mobile Tabs -->
-    <div class="lg:hidden border-b border-gray-200 bg-white">
+    <!-- Format Tabs -->
+    <div class="border-b border-gray-200 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <Tabs v-model:value="activeFormat">
+          <TabList>
+            <Tab v-for="format in FORMATS" :key="format.id" :value="format.id">
+              {{ format.label }}
+            </Tab>
+          </TabList>
+        </Tabs>
+      </div>
+    </div>
+
+    <!-- Mobile Tabs (only for CD format) -->
+    <div v-if="activeFormat === 'cd'" class="lg:hidden border-b border-gray-200 bg-white">
       <Tabs v-model:value="activeTabIndex">
         <TabList class="w-full">
           <Tab value="front" class="flex-1">Front Cover</Tab>
@@ -129,6 +147,8 @@ watch(syncSpines, (enabled) => {
     </div>
 
     <!-- Main Content -->
+    <!-- CD Format Editor -->
+    <template v-if="activeFormat === 'cd'">
     <main class="max-w-7xl mx-auto p-6 lg:p-12">
       <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 justify-center">
         
@@ -166,7 +186,14 @@ watch(syncSpines, (enabled) => {
             @update:tray="updateTray"
             @update:syncSpines="syncSpines = $event"
           />
-          <div class="mt-6 flex justify-center gap-3">
+          <div class="mt-6 flex flex-col items-center gap-3">
+            <!-- Sync Spines Toggle -->
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <span>Sync Spines</span>
+              <ToggleSwitch v-model="syncSpines" />
+            </div>
+            <!-- Upload Buttons -->
+            <div class="flex justify-center gap-3">
             <!-- Show separate buttons when sync is off -->
             <Button 
               v-if="!syncSpines"
@@ -213,6 +240,7 @@ watch(syncSpines, (enabled) => {
               class="hidden"
               @change="(e) => handleTrayUpload('rightSpine', e)"
             />
+            </div>
           </div>
         </section>
       </div>
@@ -226,10 +254,34 @@ watch(syncSpines, (enabled) => {
         <ExportPanel 
           :frontStage="frontStage"
           :trayStage="trayStage"
+          :activeFormat="activeFormat"
         />
       </div>
 
     </main>
+    </template>
+
+    <!-- Other Formats (Coming Soon) -->
+    <template v-else>
+      <main class="max-w-7xl mx-auto p-6 lg:p-12">
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+          <i class="pi pi-wrench text-6xl text-gray-300 mb-6"></i>
+          <h2 class="font-display text-3xl text-gray-600 mb-2">{{ FORMATS.find(f => f.id === activeFormat)?.label }} Format</h2>
+          <p class="text-gray-400">Coming Soon</p>
+        </div>
+        
+        <!-- Download Button -->
+        <div class="mt-8 flex justify-center">
+          <ExportPanel 
+            :frontStage="null"
+            :trayStage="null"
+            :activeFormat="activeFormat"
+          />
+        </div>
+      </main>
+    </template>
+
+
 
     <AppFooter />
   </div>
