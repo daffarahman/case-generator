@@ -152,19 +152,28 @@ watch(syncSpines, (enabled) => {
             @update:syncSpines="syncSpines = $event"
           />
           <div class="mt-6 flex justify-center gap-3">
+            <!-- Show separate buttons when sync is off -->
             <Button 
+              v-if="!syncSpines"
               label="Left Spine"
               icon="pi pi-align-left"
               severity="secondary"
-              :disabled="syncSpines"
+              @click="triggerLeftSpineUpload"
+            />
+            <!-- Show unified Spines button when sync is on -->
+            <Button 
+              v-if="syncSpines"
+              label="Spines"
+              icon="pi pi-arrows-h"
+              severity="secondary"
               @click="triggerLeftSpineUpload"
             />
             <Button label="Back Center" icon="pi pi-image" @click="triggerBackCenterUpload" />
             <Button 
+              v-if="!syncSpines"
               label="Right Spine"
               icon="pi pi-align-right"
               severity="secondary"
-              :disabled="syncSpines"
               @click="triggerRightSpineUpload"
             />
             

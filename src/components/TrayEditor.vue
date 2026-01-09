@@ -165,10 +165,14 @@ const handleBackCenterDrag = (e: any) => {
 
 const handleRightSpineDrag = (e: any) => {
   const newX = e.target.x() - rightSpineX;
-  emit('update:tray', {
+  const updatedTray = {
     ...props.tray,
     rightSpine: { image: { ...props.tray.rightSpine.image, x: newX } },
-  });
+  };
+  if (props.syncSpines) {
+    updatedTray.leftSpine = { image: { ...props.tray.leftSpine.image, x: newX } };
+  }
+  emit('update:tray', updatedTray);
 };
 
 const loadImage = (
